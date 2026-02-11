@@ -10,6 +10,7 @@ import {
   Message02Icon,
   PlusSignIcon,
   GridIcon,
+  Share08Icon,
   Settings02Icon,
   Moon02Icon,
   Sun02Icon,
@@ -31,6 +32,7 @@ interface NavRailProps {
 
 const navItems = [
   { href: "/chat", label: "Chats", icon: Message02Icon },
+  { href: "/hive", label: "Hive", icon: Share08Icon },
   { href: "/extensions", label: "Extensions", icon: GridIcon },
   { href: "/settings", label: "Settings", icon: Settings02Icon },
 ] as const;

@@ -433,3 +433,67 @@ export interface ClaudeStreamOptions {
   permissionMode?: string;
   files?: FileAttachment[];
 }
+
+// ==========================================
+// Hive (Multi-Agent Coordination) Types
+// ==========================================
+
+export interface HiveAgent {
+  id: string;
+  name: string;
+  status: 'online' | 'offline';
+  currentTask?: string;
+  lastSeen: string;
+}
+
+export interface HiveTask {
+  id: string;
+  description: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  priority: 'low' | 'normal' | 'high';
+  assignedTo?: string;
+  createdAt: string;
+  completedAt?: string;
+  result?: string;
+}
+
+export interface HiveFileLock {
+  file: string;
+  owner: string;
+  acquiredAt: string;
+  expiresAt?: string;
+}
+
+export interface HiveDecision {
+  agent: string;
+  what: string;
+  why: string;
+  timestamp: string;
+}
+
+export interface HiveActivity {
+  agent: string;
+  action: string;
+  timestamp: string;
+  details?: string;
+}
+
+export interface HiveState {
+  agents: HiveAgent[];
+  tasks: HiveTask[];
+  locks: HiveFileLock[];
+  decisions: HiveDecision[];
+  activity: HiveActivity[];
+  context?: Record<string, unknown>;
+}
+
+export interface HiveHealthResponse {
+  status: string;
+  uptime: number;
+  agentCount: number;
+}
+
+export interface HiveAddTaskRequest {
+  task: string;
+  priority?: 'low' | 'normal' | 'high';
+}
