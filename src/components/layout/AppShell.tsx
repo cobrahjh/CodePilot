@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { usePathname } from "next/navigation";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { useTheme } from "next-themes";
+import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Moon02Icon, Sun02Icon } from "@hugeicons/core-free-icons";
 import { NavRail } from "./NavRail";
 import { ChatListPanel } from "./ChatListPanel";
 import { RightPanel } from "./RightPanel";
@@ -22,6 +26,9 @@ const DISMISSED_VERSION_KEY = "codepilot_dismissed_update_version";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { theme, setTheme } = useTheme();
+  const [themeMounted, setThemeMounted] = useState(false);
+  useEffect(() => { setThemeMounted(true); }, []);
 
   const [chatListOpen, setChatListOpenRaw] = useState(false);
 
@@ -208,9 +215,33 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
               {/* Electron draggable title bar region */}
               <div
-                className="h-11 w-full shrink-0"
+                className="flex h-11 w-full shrink-0 items-center justify-end px-2"
                 style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
-              />
+              >
+                {themeMounted && (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                        className="h-7 w-7 mr-36"
+                        style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+                      >
+                        {theme === "dark" ? (
+                          <HugeiconsIcon icon={Sun02Icon} className="h-4 w-4" />
+                        ) : (
+                          <HugeiconsIcon icon={Moon02Icon} className="h-4 w-4" />
+                        )}
+                        <span className="sr-only">Toggle theme</span>
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      {theme === "dark" ? "Light mode" : "Dark mode"}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </div>
               <main className="relative flex-1 overflow-hidden">{children}</main>
             </div>
             {isChatDetailRoute && panelOpen && (
