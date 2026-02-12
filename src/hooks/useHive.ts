@@ -20,6 +20,7 @@ export function useHive(): UseHiveReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const eventSourceRef = useRef<EventSource | null>(null);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchInitial = useCallback(async () => {
     setLoading(true);
@@ -55,6 +56,10 @@ export function useHive(): UseHiveReturn {
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
     }
+    if (reconnectTimerRef.current) {
+      clearTimeout(reconnectTimerRef.current);
+      reconnectTimerRef.current = null;
+    }
 
     const es = new EventSource("/api/hive/events");
     eventSourceRef.current = es;
@@ -86,7 +91,7 @@ export function useHive(): UseHiveReturn {
       setError("SSE connection lost");
       es.close();
       // Reconnect after 5 seconds
-      setTimeout(connectSSE, 5000);
+      reconnectTimerRef.current = setTimeout(connectSSE, 5000);
     };
   }, []);
 
@@ -96,6 +101,9 @@ export function useHive(): UseHiveReturn {
 
     return () => {
       eventSourceRef.current?.close();
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+      }
     };
   }, [fetchInitial, connectSSE]);
 

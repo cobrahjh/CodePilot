@@ -438,59 +438,118 @@ export interface ClaudeStreamOptions {
 // Hive (Multi-Agent Coordination) Types
 // ==========================================
 
+// Raw agent as returned by Hivemind discovery
+export interface HiveRawAgent {
+  port: number;
+  name: string;
+  type: string;
+  host: string;
+  url: string;
+  lastSeen: number;
+  status: 'online' | 'offline';
+  // Manual agents have additional fields
+  capabilities?: string[];
+  registeredAt?: number;
+}
+
+// Normalized agent for UI display
 export interface HiveAgent {
   id: string;
   name: string;
+  type: string;
+  host: string;
+  url: string;
   status: 'online' | 'offline';
-  currentTask?: string;
-  lastSeen: string;
+  lastSeen: number;
+  capabilities?: string[];
 }
 
+// Raw pending task from Hivemind
+export interface HiveRawPendingTask {
+  id: string;
+  task: string;
+  priority: 'low' | 'normal' | 'high';
+  addedAt: number;
+}
+
+// Raw completed task from Hivemind
+export interface HiveRawCompletedTask {
+  id: string;
+  agent: string;
+  completedAt: number;
+  result: string;
+}
+
+// Normalized task for UI display
 export interface HiveTask {
   id: string;
   description: string;
   status: 'pending' | 'in_progress' | 'completed';
   priority: 'low' | 'normal' | 'high';
   assignedTo?: string;
-  createdAt: string;
-  completedAt?: string;
+  addedAt?: number;
+  completedAt?: number;
   result?: string;
 }
 
 export interface HiveFileLock {
   file: string;
   owner: string;
-  acquiredAt: string;
-  expiresAt?: string;
+  acquiredAt: number;
+  ttl?: number;
 }
 
 export interface HiveDecision {
+  id: string;
   agent: string;
   what: string;
   why: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 export interface HiveActivity {
   agent: string;
   action: string;
-  timestamp: string;
-  details?: string;
+  data?: Record<string, unknown>;
+  timestamp: number;
 }
 
+// Raw state shape from Hivemind /api/state
+export interface HiveRawState {
+  agents: {
+    discovered: Record<string, HiveRawAgent>;
+    manual: Record<string, HiveRawAgent>;
+    lastScan: number;
+  };
+  tasks: {
+    pending: HiveRawPendingTask[];
+    claimed: Record<string, unknown>;
+    completed: HiveRawCompletedTask[];
+    blocked: unknown[];
+  };
+  locks: Record<string, HiveFileLock>;
+  context: {
+    recentDecisions?: HiveDecision[];
+    [key: string]: unknown;
+  };
+  activity: HiveActivity[];
+}
+
+// Normalized state for UI consumption
 export interface HiveState {
   agents: HiveAgent[];
   tasks: HiveTask[];
   locks: HiveFileLock[];
   decisions: HiveDecision[];
   activity: HiveActivity[];
-  context?: Record<string, unknown>;
 }
 
 export interface HiveHealthResponse {
   status: string;
   uptime: number;
-  agentCount: number;
+  agents: number;
+  version?: string;
+  wsConnections?: number;
 }
 
 export interface HiveAddTaskRequest {

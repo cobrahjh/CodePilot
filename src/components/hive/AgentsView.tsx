@@ -9,6 +9,18 @@ interface AgentsViewProps {
   agents: HiveAgent[];
 }
 
+const TYPE_STYLES: Record<string, string> = {
+  coordinator: "bg-purple-500/10 text-purple-500",
+  orchestrator: "bg-blue-500/10 text-blue-500",
+  agent: "bg-green-500/10 text-green-500",
+  service: "bg-sky-500/10 text-sky-500",
+  relay: "bg-orange-500/10 text-orange-500",
+  llm: "bg-yellow-500/10 text-yellow-600",
+  registry: "bg-teal-500/10 text-teal-500",
+  "mcp-bridge": "bg-indigo-500/10 text-indigo-500",
+  daemon: "bg-pink-500/10 text-pink-500",
+};
+
 export function AgentsView({ agents }: AgentsViewProps) {
   if (agents.length === 0) {
     return (
@@ -45,14 +57,23 @@ export function AgentsView({ agents }: AgentsViewProps) {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="space-y-1">
-            {agent.currentTask ? (
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {agent.currentTask}
-              </p>
-            ) : (
-              <p className="text-sm text-muted-foreground italic">Idle</p>
-            )}
+          <CardContent className="space-y-2">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <Badge
+                variant="outline"
+                className={TYPE_STYLES[agent.type] ?? "bg-gray-500/10 text-gray-500"}
+              >
+                {agent.type}
+              </Badge>
+              {agent.capabilities?.map((cap) => (
+                <Badge key={cap} variant="outline" className="text-[10px]">
+                  {cap}
+                </Badge>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground truncate" title={agent.url}>
+              {agent.url}
+            </p>
             <p className="text-xs text-muted-foreground">
               Last seen: {formatRelativeTime(agent.lastSeen)}
             </p>

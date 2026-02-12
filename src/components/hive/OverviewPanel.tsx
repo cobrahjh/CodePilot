@@ -11,8 +11,10 @@ interface OverviewPanelProps {
 }
 
 export function OverviewPanel({ state, health, connected }: OverviewPanelProps) {
-  const agentCount = state?.agents?.length ?? health?.agentCount ?? 0;
+  const agentCount = state?.agents?.length ?? health?.agents ?? 0;
+  const onlineAgents = state?.agents?.filter((a) => a.status === "online").length ?? 0;
   const activeTasks = state?.tasks?.filter((t) => t.status !== "completed").length ?? 0;
+  const inProgressTasks = state?.tasks?.filter((t) => t.status === "in_progress").length ?? 0;
   const lockCount = state?.locks?.length ?? 0;
 
   return (
@@ -58,7 +60,7 @@ export function OverviewPanel({ state, health, connected }: OverviewPanelProps) 
         <CardContent>
           <p className="text-2xl font-bold">{agentCount}</p>
           <p className="text-xs text-muted-foreground">
-            {state?.agents?.filter((a) => a.status === "online").length ?? 0} online
+            {onlineAgents} online
           </p>
         </CardContent>
       </Card>
@@ -73,7 +75,7 @@ export function OverviewPanel({ state, health, connected }: OverviewPanelProps) 
         <CardContent>
           <p className="text-2xl font-bold">{activeTasks}</p>
           <p className="text-xs text-muted-foreground">
-            {state?.tasks?.filter((t) => t.status === "in_progress").length ?? 0} in progress
+            {inProgressTasks} in progress
           </p>
         </CardContent>
       </Card>

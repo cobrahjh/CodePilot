@@ -15,7 +15,7 @@ interface TimelineEntry {
   agent: string;
   message: string;
   detail?: string;
-  timestamp: string;
+  timestamp: number;
 }
 
 export function ActivityFeed({ decisions, activity }: ActivityFeedProps) {
@@ -34,11 +34,11 @@ export function ActivityFeed({ decisions, activity }: ActivityFeedProps) {
         kind: "activity",
         agent: a.agent,
         message: a.action,
-        detail: a.details,
+        detail: a.data ? JSON.stringify(a.data) : undefined,
         timestamp: a.timestamp,
       })
     ),
-  ].sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  ].sort((a, b) => b.timestamp - a.timestamp);
 
   if (entries.length === 0) {
     return (
@@ -58,7 +58,7 @@ export function ActivityFeed({ decisions, activity }: ActivityFeedProps) {
             </div>
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex items-center gap-2">
-                <Badge variant="secondary" className="text-[10px]">
+                <Badge variant="secondary" className="text-[10px] max-w-32 truncate">
                   {entry.agent}
                 </Badge>
                 <span className="text-xs text-muted-foreground">
@@ -67,7 +67,9 @@ export function ActivityFeed({ decisions, activity }: ActivityFeedProps) {
               </div>
               <p className="text-sm">{entry.message}</p>
               {entry.detail && (
-                <p className="text-xs text-muted-foreground">{entry.detail}</p>
+                <p className="text-xs text-muted-foreground truncate" title={entry.detail}>
+                  {entry.detail}
+                </p>
               )}
             </div>
           </div>

@@ -34,9 +34,9 @@ export function FileLocksView({ locks }: FileLocksViewProps) {
                 {formatRelativeTime(lock.acquiredAt)}
               </span>
             </div>
-            {lock.expiresAt && (
+            {lock.ttl != null && (
               <p className="text-xs text-muted-foreground">
-                Expires: {formatRelativeTime(lock.expiresAt)}
+                TTL: {Math.floor(lock.ttl / 1000)}s
               </p>
             )}
           </CardContent>

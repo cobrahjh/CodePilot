@@ -1,4 +1,4 @@
-import { fetchHive } from '@/lib/hive';
+import { fetchHive, normalizeHiveState } from '@/lib/hive';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,11 +22,12 @@ export async function GET(request: Request) {
             sendEvent('hive:error', { message: 'Hivemind unavailable' });
             return;
           }
-          const data = await res.json();
-          const json = JSON.stringify(data);
+          const raw = await res.json();
+          const json = JSON.stringify(raw);
           if (json !== previousJson) {
             previousJson = json;
-            sendEvent('hive:state', data);
+            const normalized = normalizeHiveState(raw);
+            sendEvent('hive:state', normalized);
           }
         } catch {
           sendEvent('hive:error', { message: 'Connection to Hivemind lost' });
